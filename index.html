@@ -171,5 +171,37 @@
         .catch(() => console.warn('⚠️ Unable to fetch sw.js, skipping Service Worker registration.'));
     }
   </script>
+  <audio id="bgm" autoplay loop>
+  <source src="music1.mp3" type="audio/mpeg">
+</audio>
+<button id="toggle-music">🔊</button>
+
+<script>
+  const bgm = document.getElementById("bgm");
+  const toggleBtn = document.getElementById("toggle-music");
+  toggleBtn.onclick = () => {
+    if (bgm.paused) {
+      bgm.play();
+      toggleBtn.textContent = "🔊";
+    } else {
+      bgm.pause();
+      toggleBtn.textContent = "🔇";
+    }
+  };
+</script>
+
+<style>
+  #toggle-music {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    font-size: 20px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    z-index: 9999;
+  }
+</style>
 </body>
 </html>
