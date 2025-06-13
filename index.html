@@ -20,6 +20,35 @@
       padding: 2rem;
     }
 
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #1e1e1e;
+      color: #fff;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #progress-container {
+      margin-top: 1rem;
+      width: 300px;
+      background: #333;
+      border: 2px solid #555;
+      height: 20px;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0;
+      background: #ffe347;
+      transition: width 0.2s ease;
+    }
+
     h1 {
       color: #ffe347;
       text-shadow: 2px 2px #333;
@@ -62,6 +91,12 @@
   </style>
 </head>
 <body>
+  <div id="loading-screen">
+    <p id="loading-text">⛏️ Generating Workspace Launcher...</p>
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+  </div>
   <h1>Google Workspace Launcher</h1>
   <div class="grid">
     <a href="https://docs.google.com/document" class="app" target="_blank">
@@ -102,6 +137,26 @@
     </a>
   </div>
   <script>
+    const tips = [
+      "Don’t dig straight down!", "The creeper is always watching...", "Punching trees gives wood.", "Diamonds are a miner’s best friend.", "There is no escape from the void.", "Keep your inventory tidy!", "Monsters spawn in darkness…", "Sleep to skip the night.", "Watch your step in the Nether.", "Villagers gossip when you're not looking.","Sometimes iron golems give flowers to the villager children!","Endermen hate bath time!","Different colored dyes can be made from a variety of materials, cook cactus in a furnace to get green dye!","Creepers are the easiest obtainable source of gunpowder.",	"Obsidian can be mined with a diamond pickaxe.","Wolves and iron golems won't attack creepers.","Attacking a wolf will cause any wolves nearby to turn hostile and attack you.","Break blocks, pick up resources. Use the crafting grid to make helpful items. Now you're crafting!","You have endless lives, but your items drop to the ground when you die. Hurry back to pick them up!","It's a good idea to build a place where you can safely spend the night.","Use the right tool for the job! Chopping wood with an axe is much faster than using your hands.","Even in Minecraft you'll get hungry, so try to find something to eat before that happens.","Digging straight down or straight up might not be a great idea.","Monsters spawn in the dark. Craft a torch to brighten up any space.","Beds are great! Craft one to quickly pass the night and set your respawn point.","Survival mode has 4 different difficulty levels - Peaceful, Easy, Normal, and Hard. Or play Creative mode and get endless resources!","Be careful when you swim. Stay under water for too long and you'll run out of air.","Do people actually read these?","The world of Minecraft is endlessly surprising. You'll find lots of different animals, plants, ...and even !@#$%^&*","Tếu Tếu too bel... Minecraft's gone","You can milk a cow","You can milk a cow","There's a chance a creeper is behind you... RIGHT NOW"
+    ];
+    document.getElementById("loading-text").textContent =
+      tips[Math.floor(Math.random() * tips.length)];
+
+    let progress = 0;
+    const bar = document.getElementById("progress-bar");
+    const interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 10) + 5;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        setTimeout(() => {
+          document.getElementById("loading-screen").style.display = "none";
+        }, 300);
+      }
+      bar.style.width = progress + "%";
+    }, 200);
+
     if ('serviceWorker' in navigator) {
       fetch('sw.js', { method: 'HEAD' })
         .then(response => {
