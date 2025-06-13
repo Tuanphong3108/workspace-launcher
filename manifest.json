@@ -1,0 +1,15 @@
+{
+  "name": "Google Workspace Launcher",
+  "short_name": "Workspace",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#2e2e2e",
+  "theme_color": "#2e2e2e",
+  "icons": [
+    {
+      "src": "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    }
+  ]
+}
