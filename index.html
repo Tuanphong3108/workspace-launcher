@@ -26,31 +26,6 @@
     body.season-autumn { background: #8d6e63; }
     body.season-winter { background: #cfd8dc; }
 
-    #lock-screen {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      color: white;
-      z-index: 10000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 24px;
-    }
-
-    #lock-screen input, #lock-screen button {
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      padding: 8px 12px;
-      background: #111;
-      border: 1px solid #444;
-      color: white;
-      outline: none;
-      margin-top: 10px;
-      text-align: center;
-    }
-
     #toggle-music {
       position: fixed;
       top: 12px;
@@ -59,19 +34,6 @@
       background: none;
       border: none;
       color: #fff;
-      cursor: pointer;
-      z-index: 9999;
-    }
-
-    #logout-button {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      font-size: 18px;
-      background: #555;
-      border: none;
-      color: white;
-      padding: 6px 12px;
       cursor: pointer;
       z-index: 9999;
     }
@@ -144,17 +106,29 @@
       display: block;
       font-size: 1rem;
     }
+
+    #chest-icon {
+      animation: chest-bounce 1.2s ease infinite;
+    }
+
+    @keyframes chest-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .open-animation {
+      animation: chest-open 0.6s ease forwards;
+    }
+
+    @keyframes chest-open {
+      0% { transform: scale(1) rotateX(0); opacity: 1; }
+      100% { transform: scale(1.1) rotateX(50deg); opacity: 0; }
+    }
   </style>
 </head>
 <body>
-  <div id="lock-screen">
-    <div>🔒 Enter password to access:</div>
-    <input type="password" id="password">
-    <button id="unlock-button">Unlock</button>
-    <div id="error-msg" style="color: red; margin-top: 10px;"></div>
-  </div>
-
-  <div id="loading-screen">
+  <div id="loading-screen" class="intro-chest">
+    <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/1/11/Chest_%28S%29_BE1.png/revision/latest?cb=20191203082210" alt="Chest" id="chest-icon" style="width:96px;height:96px;margin-bottom:12px;">
     <p id="loading-text">⛏️ Generating Workspace Launcher...</p>
     <div id="progress-container">
       <div id="progress-bar"></div>
@@ -201,37 +175,10 @@
     </a>
   </div>
 
-  <button id="logout-button">🔒 Đăng xuất</button>
   <audio id="bgm" autoplay loop><source src="music1.mp3" type="audio/mpeg"></audio>
   <button id="toggle-music">🔊</button>
 
   <script>
-    const PASS = "phongvip";
-    const lockScreen = document.getElementById("lock-screen");
-    const unlockBtn = document.getElementById("unlock-button");
-
-    if (localStorage.getItem("unlocked") === "true") {
-      lockScreen.style.display = "none";
-    } else {
-      lockScreen.style.display = "flex";
-    }
-
-    function checkPassword() {
-      const input = document.getElementById("password").value;
-      if (input === PASS) {
-        localStorage.setItem("unlocked", "true");
-        lockScreen.style.display = "none";
-      } else {
-        document.getElementById("error-msg").textContent = "❌ Wrong password!";
-      }
-    }
-    unlockBtn.addEventListener("click", checkPassword);
-
-    document.getElementById("logout-button").onclick = () => {
-      localStorage.removeItem("unlocked");
-      location.reload();
-    };
-
     function getSeason() {
       const month = new Date().getMonth() + 1;
       if (month >= 1 && month <= 3) return "spring";
@@ -258,9 +205,10 @@
       if (progress >= 100) {
         progress = 100;
         clearInterval(interval);
+        document.getElementById("loading-screen").classList.add("open-animation");
         setTimeout(() => {
           document.getElementById("loading-screen").style.display = "none";
-        }, 300);
+        }, 600);
       }
       bar.style.width = progress + "%";
     }, 200);
@@ -279,7 +227,7 @@
 
     const emojiMap = {
       spring: '🌸',
-      summer: '🌞',
+      summer: '✨',
       autumn: '🍂',
       winter: '❄️'
     };
@@ -304,6 +252,10 @@
       }, 50);
     }
     setInterval(spawnEmoji, 800);
+
+    const chestSound = new Audio("https://cdn.jsdelivr.net/gh/PhongVN-dev/mc-assets/chest_open.mp3");
+    chestSound.volume = 0.5;
+    chestSound.play().catch(() => {});
   </script>
 </body>
 </html>
