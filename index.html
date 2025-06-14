@@ -11,7 +11,6 @@
 
     body {
       margin: 0;
-      background: #2e2e2e;
       font-family: 'VT323', monospace;
       font-size: 18px;
       color: #fff;
@@ -19,7 +18,13 @@
       flex-direction: column;
       align-items: center;
       padding: 2rem;
+      transition: background 0.5s ease;
     }
+
+    body.season-spring { background: #f2cde9; }
+    body.season-summer { background: #fff176; }
+    body.season-autumn { background: #8d6e63; }
+    body.season-winter { background: #cfd8dc; }
 
     #lock-screen {
       position: fixed;
@@ -47,29 +52,29 @@
     }
 
     #toggle-music {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  font-size: 20px;
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  z-index: 9999;
-}
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      font-size: 20px;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      z-index: 9999;
+    }
 
-#logout-button {
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  font-size: 18px;
-  background: #555;
-  border: none;
-  color: white;
-  padding: 6px 12px;
-  cursor: pointer;
-  z-index: 9999;
-}
+    #logout-button {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      font-size: 18px;
+      background: #555;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      cursor: pointer;
+      z-index: 9999;
+    }
 
     #loading-screen {
       position: fixed;
@@ -145,7 +150,7 @@
   <div id="lock-screen">
     <div>🔒 Enter password to access:</div>
     <input type="password" id="password">
-    <button onclick="checkPassword()">Unlock</button>
+    <button id="unlock-button">Unlock</button>
     <div id="error-msg" style="color: red; margin-top: 10px;"></div>
   </div>
 
@@ -201,9 +206,10 @@
   <button id="toggle-music">🔊</button>
 
   <script>
-    console.log("Launcher script loaded");
     const PASS = "phongvip";
     const lockScreen = document.getElementById("lock-screen");
+    const unlockBtn = document.getElementById("unlock-button");
+
     if (localStorage.getItem("unlocked") === "true") {
       lockScreen.style.display = "none";
     } else {
@@ -219,25 +225,30 @@
         document.getElementById("error-msg").textContent = "❌ Wrong password!";
       }
     }
+    unlockBtn.addEventListener("click", checkPassword);
 
     document.getElementById("logout-button").onclick = () => {
       localStorage.removeItem("unlocked");
       location.reload();
     };
 
-    document.addEventListener("keydown", e => {
-      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key))) {
-        e.preventDefault();
-        alert("🚫 DevTools is disabled!");
-      }
-    });
+    function getSeason() {
+      const month = new Date().getMonth() + 1;
+      if (month >= 1 && month <= 3) return "spring";
+      if (month >= 4 && month <= 6) return "summer";
+      if (month >= 7 && month <= 9) return "autumn";
+      return "winter";
+    }
+    const season = getSeason();
+    document.body.classList.add("season-" + season);
 
-    const tips = [
-      "Don’t dig straight down!", "The creeper is always watching...", "Punching trees gives wood.",
-      "Diamonds are a miner’s best friend.", "There is no escape from the void.",
-      "Tếu Tếu too bel... Minecraft's gone", "You can milk a cow",
-      "There's a chance a creeper is behind you... RIGHT NOW"
-    ];
+    const tipsBySeason = {
+      spring: ["Ý tưởng nở như hoa...", "Mùa viết code đẹp như Sakura"],
+      summer: ["Bật điều hòa, mở Google Docs", "Nhiệt huyết như mặt trời Hạ"],
+      autumn: ["Từng ý tưởng rơi như lá vàng", "Chill nhẹ cùng Docs mùa thu"],
+      winter: ["Chill nhẹ giữa bão deadline", "Gõ văn bản trong giá lạnh"]
+    };
+    const tips = tipsBySeason[season];
     document.getElementById("loading-text").textContent = tips[Math.floor(Math.random() * tips.length)];
 
     let progress = 0;
@@ -265,6 +276,34 @@
         toggleBtn.textContent = "🔇";
       }
     };
+
+    const emojiMap = {
+      spring: '🌸',
+      summer: '🌞',
+      autumn: '🍂',
+      winter: '❄️'
+    };
+
+    const emoji = emojiMap[season];
+    function spawnEmoji() {
+      const e = document.createElement('div');
+      e.textContent = emoji;
+      e.style.position = 'fixed';
+      e.style.left = Math.random() * 100 + 'vw';
+      e.style.top = '-2rem';
+      e.style.fontSize = '24px';
+      e.style.opacity = 0.8;
+      e.style.zIndex = 999;
+      e.style.pointerEvents = 'none';
+      e.style.transition = 'transform 5s linear, opacity 5s';
+      document.body.appendChild(e);
+      setTimeout(() => {
+        e.style.transform = `translateY(110vh)`;
+        e.style.opacity = 0;
+        setTimeout(() => e.remove(), 5000);
+      }, 50);
+    }
+    setInterval(spawnEmoji, 800);
   </script>
 </body>
 </html>
