@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Google Workspace Launcher</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.ico">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
@@ -20,6 +21,56 @@
       padding: 2rem;
     }
 
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      color: white;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+    }
+
+    #lock-screen input, #lock-screen button {
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      padding: 8px 12px;
+      background: #111;
+      border: 1px solid #444;
+      color: white;
+      outline: none;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    #toggle-music {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  z-index: 9999;
+}
+
+#logout-button {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  font-size: 18px;
+  background: #555;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  cursor: pointer;
+  z-index: 9999;
+}
+
     #loading-screen {
       position: fixed;
       inset: 0;
@@ -31,7 +82,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
+      z-index: 9998;
     }
 
     #progress-container {
@@ -91,12 +142,20 @@
   </style>
 </head>
 <body>
+  <div id="lock-screen">
+    <div>🔒 Enter password to access:</div>
+    <input type="password" id="password">
+    <button onclick="checkPassword()">Unlock</button>
+    <div id="error-msg" style="color: red; margin-top: 10px;"></div>
+  </div>
+
   <div id="loading-screen">
     <p id="loading-text">⛏️ Generating Workspace Launcher...</p>
     <div id="progress-container">
       <div id="progress-bar"></div>
     </div>
   </div>
+
   <h1>Google Workspace Launcher</h1>
   <div class="grid">
     <a href="https://docs.google.com/document" class="app" target="_blank">
@@ -136,12 +195,50 @@
       <span>Meet</span>
     </a>
   </div>
+
+  <button id="logout-button">🔒 Đăng xuất</button>
+  <audio id="bgm" autoplay loop><source src="music1.mp3" type="audio/mpeg"></audio>
+  <button id="toggle-music">🔊</button>
+
   <script>
+    console.log("Launcher script loaded");
+    const PASS = "phongvip";
+    const lockScreen = document.getElementById("lock-screen");
+    if (localStorage.getItem("unlocked") === "true") {
+      lockScreen.style.display = "none";
+    } else {
+      lockScreen.style.display = "flex";
+    }
+
+    function checkPassword() {
+      const input = document.getElementById("password").value;
+      if (input === PASS) {
+        localStorage.setItem("unlocked", "true");
+        lockScreen.style.display = "none";
+      } else {
+        document.getElementById("error-msg").textContent = "❌ Wrong password!";
+      }
+    }
+
+    document.getElementById("logout-button").onclick = () => {
+      localStorage.removeItem("unlocked");
+      location.reload();
+    };
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key))) {
+        e.preventDefault();
+        alert("🚫 DevTools is disabled!");
+      }
+    });
+
     const tips = [
-      "Don’t dig straight down!", "The creeper is always watching...", "Punching trees gives wood.", "Diamonds are a miner’s best friend.", "There is no escape from the void.", "Keep your inventory tidy!", "Monsters spawn in darkness…", "Sleep to skip the night.", "Watch your step in the Nether.", "Villagers gossip when you're not looking.","Sometimes iron golems give flowers to the villager children!","Endermen hate bath time!","Different colored dyes can be made from a variety of materials, cook cactus in a furnace to get green dye!","Creepers are the easiest obtainable source of gunpowder.",	"Obsidian can be mined with a diamond pickaxe.","Wolves and iron golems won't attack creepers.","Attacking a wolf will cause any wolves nearby to turn hostile and attack you.","Break blocks, pick up resources. Use the crafting grid to make helpful items. Now you're crafting!","You have endless lives, but your items drop to the ground when you die. Hurry back to pick them up!","It's a good idea to build a place where you can safely spend the night.","Use the right tool for the job! Chopping wood with an axe is much faster than using your hands.","Even in Minecraft you'll get hungry, so try to find something to eat before that happens.","Digging straight down or straight up might not be a great idea.","Monsters spawn in the dark. Craft a torch to brighten up any space.","Beds are great! Craft one to quickly pass the night and set your respawn point.","Survival mode has 4 different difficulty levels - Peaceful, Easy, Normal, and Hard. Or play Creative mode and get endless resources!","Be careful when you swim. Stay under water for too long and you'll run out of air.","Do people actually read these?","The world of Minecraft is endlessly surprising. You'll find lots of different animals, plants, ...and even !@#$%^&*","Tếu Tếu too bel... Minecraft's gone","You can milk a cow","You can milk a cow","There's a chance a creeper is behind you... RIGHT NOW"
+      "Don’t dig straight down!", "The creeper is always watching...", "Punching trees gives wood.",
+      "Diamonds are a miner’s best friend.", "There is no escape from the void.",
+      "Tếu Tếu too bel... Minecraft's gone", "You can milk a cow",
+      "There's a chance a creeper is behind you... RIGHT NOW"
     ];
-    document.getElementById("loading-text").textContent =
-      tips[Math.floor(Math.random() * tips.length)];
+    document.getElementById("loading-text").textContent = tips[Math.floor(Math.random() * tips.length)];
 
     let progress = 0;
     const bar = document.getElementById("progress-bar");
@@ -157,51 +254,17 @@
       bar.style.width = progress + "%";
     }, 200);
 
-    if ('serviceWorker' in navigator) {
-      fetch('sw.js', { method: 'HEAD' })
-        .then(response => {
-          if (response.ok) {
-            navigator.serviceWorker.register('sw.js')
-              .then(() => console.log('✅ Service Worker registered'))
-              .catch(err => console.error('❌ Service Worker registration failed:', err));
-          } else {
-            console.warn('⚠️ sw.js not found, skipping Service Worker registration.');
-          }
-        })
-        .catch(() => console.warn('⚠️ Unable to fetch sw.js, skipping Service Worker registration.'));
-    }
+    const bgm = document.getElementById("bgm");
+    const toggleBtn = document.getElementById("toggle-music");
+    toggleBtn.onclick = () => {
+      if (bgm.paused) {
+        bgm.play();
+        toggleBtn.textContent = "🔊";
+      } else {
+        bgm.pause();
+        toggleBtn.textContent = "🔇";
+      }
+    };
   </script>
-<audio id="bgm" autoplay loop>
-  <source src="music1.mp3" type="audio/mpeg">
-</audio>
-<button id="toggle-music">🔊</button>
-
-<script>
-  const bgm = document.getElementById("bgm");
-  const toggleBtn = document.getElementById("toggle-music");
-  toggleBtn.onclick = () => {
-    if (bgm.paused) {
-      bgm.play();
-      toggleBtn.textContent = "🔊";
-    } else {
-      bgm.pause();
-      toggleBtn.textContent = "🔇";
-    }
-  };
-</script>
-
-<style>
-  #toggle-music {
-    position: fixed;
-    top: 12px;
-    right: 12px;
-    font-size: 20px;
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    z-index: 9999;
-  }
-</style>
 </body>
 </html>
