@@ -1,278 +1,374 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Workspace Launcher</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon.ico">
+  <title>Google Workspace Launcher - MD3 Edition</title>
+  
+  <!-- Google Sans Flex & Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-     @font-face {
-      font-family: 'Google Sans';
-      src: url('https://tuanphong3108.github.io/google-sans-do-not-access/GoogleSans-Regular.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
+    :root {
+      /* MD3 Color Palette - Dynamic & Expressive */
+      --md-sys-color-primary: #D0BCFF;
+      --md-sys-color-on-primary: #381E72;
+      --md-sys-color-primary-container: #4F378B;
+      --md-sys-color-on-primary-container: #EADDFF;
+      --md-sys-color-surface: #1C1B1F;
+      --md-sys-color-on-surface: #E6E1E5;
+      --md-sys-color-surface-variant: #49454F;
+      --md-sys-color-on-surface-variant: #CAC4D0;
+      --md-sys-color-outline: #938F99;
+      
+      /* Season Colors */
+      --season-spring: #2D5A27;
+      --season-summer: #FFB300;
+      --season-autumn: #D84315;
+      --season-winter: #0277BD;
     }
-        @font-face {
-  font-family: 'Google Sans';
-  src: url('https://tuanphong3108.github.io/google-sans-do-not-access/GoogleSans-Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Google Sans';
-  src: url('https://tuanphong3108.github.io/google-sans-do-not-access/GoogleSans-Italic.ttf') format('truetype');
-  font-weight: normal;
-  font-style: italic;
-}
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       margin: 0;
-      font-family: 'Google Sans', monospace;
-      font-size: 18px;
-      color: #fff;
+      padding: 0;
+      font-family: 'Google Sans Flex', sans-serif;
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem;
-      transition: background 0.5s ease;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    body.season-spring { background: #f2cde9; }
-    body.season-summer { background: #fff176; }
-    body.season-autumn { background: #8d6e63; }
-    body.season-winter { background: #cfd8dc; }
-
-    #toggle-music {
+    /* Season Background Overlays */
+    body::before {
+      content: '';
       position: fixed;
-      top: 12px;
-      right: 12px;
-      font-size: 20px;
-      background: none;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      z-index: 9999;
+      inset: 0;
+      opacity: 0.15;
+      z-index: -1;
+      transition: background 1s ease;
     }
+    body.season-spring::before { background: linear-gradient(135deg, var(--season-spring), transparent); }
+    body.season-summer::before { background: linear-gradient(135deg, var(--season-summer), transparent); }
+    body.season-autumn::before { background: linear-gradient(135deg, var(--season-autumn), transparent); }
+    body.season-winter::before { background: linear-gradient(135deg, var(--season-winter), transparent); }
 
+    /* Custom Loading Screen - Fix for Rectangle GIF */
     #loading-screen {
       position: fixed;
       inset: 0;
-      background: #1e1e1e;
-      color: #fff;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
+      background: #141218;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 9998;
+      z-index: 10000;
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
     }
 
-    #progress-container {
-      margin-top: 1rem;
-      width: 300px;
-      background: #333;
-      border: 2px solid #555;
-      height: 20px;
+    .loading-indicator {
+      /* Bỏ width/height cố định vuông để GIF HCN không bị méo */
+      max-width: 200px; /* Giới hạn độ rộng để không quá to */
+      height: auto;     /* Tự động theo tỉ lệ của GIF */
+      /* Filter to match MD3 Primary color */
+      filter: sepia(100%) saturate(300%) hue-rotate(240deg) brightness(90%);
+      margin-bottom: 24px;
+      border-radius: 12px; /* Bo nhẹ các góc của GIF nếu cần */
     }
 
-    #progress-bar {
-      height: 100%;
-      width: 0;
-      background: #ffe347;
-      transition: width 0.2s ease;
+    #loading-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--md-sys-color-primary);
+      letter-spacing: 0.5px;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    /* Header Styling */
+    header {
+      margin: 64px 0 40px;
+      text-align: center;
     }
 
     h1 {
-      color: #ffe347;
-      text-shadow: 2px 2px #333;
-      margin-bottom: 1.5rem;
+      font-size: clamp(2.2rem, 10vw, 4rem);
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(to bottom, #fff, var(--md-sys-color-on-surface-variant));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1.5px;
     }
 
+    /* Launcher Grid - Dàn hàng ngang full màn hình */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1rem;
-      width: 100%;
-      max-width: 800px;
+      /* Tự động xếp hàng ngang, tối thiểu 150px mỗi ô */
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 24px;
+      width: 95%;
+      max-width: 1400px; /* Rộng hơn để chiếm trọn màn hình PC */
+      padding: 20px;
+      justify-content: center;
     }
 
-    .app {
-      background: #3a3a3a;
-      padding: 1rem;
-      border: 3px solid #707070;
-      border-radius: 8px;
-      text-align: center;
-      transition: transform 0.2s ease;
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 16px;
+        width: 100%;
+      }
+    }
+
+    /* App Card - MD3 Expressive với hiệu ứng Overshoot */
+    .app-card {
+      background: var(--md-sys-color-surface-variant);
+      border-radius: 32px;
+      padding: 28px 16px;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: 
+        transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+        background-color 0.3s ease,
+        box-shadow 0.4s ease;
       cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.05);
+      aspect-ratio: 1 / 1.05;
     }
 
-    .app:hover {
-      transform: scale(1.05);
-      background-color: #505050;
+    .app-card:hover {
+      transform: scale(1.1) translateY(-10px);
+      background-color: #5a5463;
+      border-color: var(--md-sys-color-outline);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.5);
     }
 
-    .app img {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 0.5rem;
+    .app-card:active {
+      transform: scale(0.92);
     }
 
-    .app span {
-      display: block;
+    .app-icon {
+      width: clamp(44px, 12vw, 64px);
+      height: auto;
+      object-fit: contain;
+      transition: transform 0.4s ease;
+    }
+
+    .app-card:hover .app-icon {
+      transform: scale(1.2) rotate(3deg);
+    }
+
+    .app-label {
+      color: var(--md-sys-color-on-surface);
       font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      letter-spacing: 0.2px;
     }
 
-    #chest-icon {
-      animation: chest-bounce 1.2s ease infinite;
+    /* Music Control Button */
+    #music-control {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 100;
     }
 
-    @keyframes chest-bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+    #music-control:hover {
+      border-radius: 16px;
+      transform: scale(1.15) rotate(-5deg);
     }
 
-    .open-animation {
-      animation: chest-open 0.6s ease forwards;
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 30px;
+      transition: all 0.3s ease;
     }
 
-    @keyframes chest-open {
-      0% { transform: scale(1) rotateX(0); opacity: 1; }
-      100% { transform: scale(1.1) rotateX(50deg); opacity: 0; }
+    #music-control:hover .material-symbols-outlined {
+      font-variation-settings: 'FILL' 1;
+    }
+
+    /* Season Particles */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99;
+      user-select: none;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(105vh) rotate(360deg); }
     }
   </style>
 </head>
-<body>
-  <div id="loading-screen" class="intro-chest">
-    <p id="loading-text">⛏️ Generating Workspace Launcher...</p>
-    <div id="progress-container">
-      <div id="progress-bar"></div>
-    </div>
+<body id="main-body">
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <!-- Updated for Rectangle GIF -->
+    <img src="https://tuanphong3108.github.io/md3-loading/Loading_Indicator.gif" alt="Loading" class="loading-indicator">
+    <div id="loading-text">Chờ chút nhé, đang "độ" lại không gian...</div>
   </div>
 
-  <h1>Google Workspace Launcher</h1>
-  <div class="grid">
-    <a href="https://docs.google.com/document" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x32.png" alt="Docs">
-      <span>Docs</span>
-    </a>
-    <a href="https://docs.google.com/spreadsheets" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x32.png" alt="Sheets">
-      <span>Sheets</span>
-    </a>
-    <a href="https://docs.google.com/presentation" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_presentation_x32.png" alt="Slides">
-      <span>Slides</span>
-    </a>
-    <a href="https://mail.google.com" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="Gmail">
-      <span>Gmail</span>
-    </a>
-    <a href="https://drive.google.com" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt="Drive">
-      <span>Drive</span>
-    </a>
-    <a href="https://keep.google.com" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/images/branding/product/1x/keep_2020q4_48dp.png" alt="Keep">
-      <span>Keep</span>
-    </a>
-    <a href="https://tasks.google.com" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/images/branding/product/1x/tasks_48dp.png" alt="Tasks">
-      <span>Tasks</span>
-    </a>
-    <a href="https://calendar.google.com" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" alt="Calendar">
-      <span>Calendar</span>
-    </a>
-    <a href="https://meet.google.com" class="app" target="_blank">
-      <img src="https://ssl.gstatic.com/images/branding/product/1x/meet_2020q4_48dp.png" alt="Meet">
-      <span>Meet</span>
-    </a>
-  </div>
+  <header>
+    <h1>Workspace</h1>
+  </header>
 
-  <audio id="bgm" autoplay loop><source src="music1.mp3" type="audio/mpeg"></audio>
-  <button id="toggle-music">🔊</button>
+  <main class="grid">
+    <!-- Lặp lại các App Card -->
+    <a href="https://docs.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x32.png" class="app-icon" alt="Docs">
+      <span class="app-label">Tài liệu</span>
+    </a>
+    <a href="https://sheets.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_spreadsheet_x32.png" class="app-icon" alt="Sheets">
+      <span class="app-label">Bảng tính</span>
+    </a>
+    <a href="https://slides.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_presentation_x32.png" class="app-icon" alt="Slides">
+      <span class="app-label">Trình bày</span>
+    </a>
+    <a href="https://mail.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" class="app-icon" alt="Gmail">
+      <span class="app-label">Gmail</span>
+    </a>
+    <a href="https://drive.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" class="app-icon" alt="Drive">
+      <span class="app-label">Drive</span>
+    </a>
+    <a href="https://keep.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/images/branding/product/1x/keep_2020q4_48dp.png" class="app-icon" alt="Keep">
+      <span class="app-label">Ghi chú</span>
+    </a>
+    <a href="https://calendar.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" class="app-icon" alt="Calendar">
+      <span class="app-label">Lịch</span>
+    </a>
+    <a href="https://meet.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/images/branding/product/1x/meet_2020q4_48dp.png" class="app-icon" alt="Meet">
+      <span class="app-label">Họp mặt</span>
+    </a>
+    <a href="https://tasks.google.com" target="_blank" class="app-card">
+      <img src="https://ssl.gstatic.com/images/branding/product/1x/tasks_48dp.png" class="app-icon" alt="Tasks">
+      <span class="app-label">Công việc</span>
+    </a>
+  </main>
+
+  <audio id="bgm" loop>
+    <source src="music1.mp3" type="audio/mpeg">
+  </audio>
+
+  <button id="music-control" title="Bật/Tắt Nhạc">
+    <span class="material-symbols-outlined">volume_up</span>
+  </button>
 
   <script>
-    function getSeason() {
+    // Logic mùa và background
+    function updateSeason() {
       const month = new Date().getMonth() + 1;
-      if (month >= 1 && month <= 3) return "spring";
-      if (month >= 4 && month <= 6) return "summer";
-      if (month >= 7 && month <= 9) return "autumn";
-      return "winter";
-    }
-    const season = getSeason();
-    document.body.classList.add("season-" + season);
+      let season = "winter";
+      let tips = ["Chill nhẹ giữa bão deadline ❄️", "Code trong giá lạnh nhưng tim vẫn nóng 🔥"];
+      let emoji = "❄️";
 
-    const tipsBySeason = {
-      spring: ["Ý tưởng nở như hoa...", "Mùa viết code đẹp như Sakura"],
-      summer: ["Bật điều hòa, mở Google Docs", "Nhiệt huyết như mặt trời Hạ"],
-      autumn: ["Từng ý tưởng rơi như lá vàng", "Chill nhẹ cùng Docs mùa thu"],
-      winter: ["Chill nhẹ giữa bão deadline", "Gõ văn bản trong giá lạnh"]
-    };
-    const tips = tipsBySeason[season];
-    document.getElementById("loading-text").textContent = tips[Math.floor(Math.random() * tips.length)];
-
-    let progress = 0;
-    const bar = document.getElementById("progress-bar");
-    const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 10) + 5;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
-        document.getElementById("loading-screen").classList.add("open-animation");
-        setTimeout(() => {
-          document.getElementById("loading-screen").style.display = "none";
-        }, 600);
+      if (month >= 2 && month <= 4) {
+        season = "spring";
+        tips = ["Ý tưởng nở rộ như hoa xuân 🌸", "Khởi đầu mới đầy năng lượng!"];
+        emoji = "🌸";
+      } else if (month >= 5 && month <= 7) {
+        season = "summer";
+        tips = ["Nhiệt huyết như nắng mùa hè ☀️", "Code xuyên đêm, quạt quay vèo vèo"];
+        emoji = "✨";
+      } else if (month >= 8 && month <= 10) {
+        season = "autumn";
+        tips = ["Từng ý tưởng rơi nhẹ nhàng như lá 🍂", "Chill cùng ly cà phê mùa thu"];
+        emoji = "🍂";
       }
-      bar.style.width = progress + "%";
-    }, 200);
 
-    const bgm = document.getElementById("bgm");
-    const toggleBtn = document.getElementById("toggle-music");
-    toggleBtn.onclick = () => {
+      document.body.className = "season-" + season;
+      document.getElementById("loading-text").textContent = tips[Math.floor(Math.random() * tips.length)];
+      return emoji;
+    }
+
+    const currentEmoji = updateSeason();
+
+    // Loading Screen
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loading-screen');
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.visibility = 'hidden'; }, 600);
+      }, 2000);
+    });
+
+    // Music
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('music-control');
+    const musicIcon = musicBtn.querySelector('.material-symbols-outlined');
+
+    musicBtn.addEventListener('click', () => {
       if (bgm.paused) {
-        bgm.play();
-        toggleBtn.textContent = "🔊";
+        bgm.play().catch(() => {});
+        musicIcon.textContent = 'volume_up';
       } else {
         bgm.pause();
-        toggleBtn.textContent = "🔇";
+        musicIcon.textContent = 'volume_off';
       }
-    };
+    });
 
-    const emojiMap = {
-      spring: '🌸',
-      summer: '✨',
-      autumn: '🍂',
-      winter: '❄️'
-    };
-
-    const emoji = emojiMap[season];
-    function spawnEmoji() {
-      const e = document.createElement('div');
-      e.textContent = emoji;
-      e.style.position = 'fixed';
-      e.style.left = Math.random() * 100 + 'vw';
-      e.style.top = '-2rem';
-      e.style.fontSize = '24px';
-      e.style.opacity = 0.8;
-      e.style.zIndex = 999;
-      e.style.pointerEvents = 'none';
-      e.style.transition = 'transform 5s linear, opacity 5s';
-      document.body.appendChild(e);
-      setTimeout(() => {
-        e.style.transform = `translateY(110vh)`;
-        e.style.opacity = 0;
-        setTimeout(() => e.remove(), 5000);
-      }, 50);
+    // Particles
+    function createParticle() {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = currentEmoji;
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = '-5vh';
+      p.style.fontSize = (Math.random() * 20 + 12) + 'px';
+      const duration = Math.random() * 4 + 4;
+      p.style.animationDuration = duration + 's';
+      p.style.opacity = Math.random() * 0.4 + 0.2;
+      document.body.appendChild(p);
+      setTimeout(() => { p.remove(); }, duration * 1000);
     }
-    setInterval(spawnEmoji, 800);
+    setInterval(createParticle, 800);
 
+    // Minecraft Chest Sound Effect
     const chestSound = new Audio("https://cdn.jsdelivr.net/gh/PhongVN-dev/mc-assets/chest_open.mp3");
-    chestSound.volume = 0.5;
-    chestSound.play().catch(() => {});
+    chestSound.volume = 0.25;
+
+    document.querySelectorAll('.app-card').forEach(card => {
+      card.addEventListener('click', () => {
+        chestSound.currentTime = 0;
+        chestSound.play().catch(() => {});
+      });
+    });
   </script>
 </body>
 </html>
